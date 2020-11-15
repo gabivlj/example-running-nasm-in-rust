@@ -11,14 +11,23 @@ extern "C" {
 fn main() {
     little_endian_example();
 
+    let tb = time::Instant::now();
+    println!("add: {}", factorial_r(44));
+    let elapsed_tb = tb.elapsed().as_micros();
+    println!("rust version time elapsed: {}micros", elapsed_tb);
+
     // Call asm factorial
-    println!("add: {}", factorial(32));
+    let tb = time::Instant::now();
+    println!("add: {}", factorial(44));
+    let elapsed_tb = tb.elapsed().as_micros();
+    println!("asm version time elapsed: {}micros", elapsed_tb);
 
     const REPEAT: usize = 100000000;
     let tb = time::Instant::now();
     println!("number of 1 bits: {}", count_bits(" ".repeat(REPEAT)));
     let elapsed_tb = tb.elapsed().as_millis();
     println!("assembly version time elapsed: {}ms", elapsed_tb);
+
     let tb = time::Instant::now();
     println!(
         "number of 1 bits rust version: {}",
@@ -26,6 +35,13 @@ fn main() {
     );
     let elapsed_tb = tb.elapsed().as_millis();
     println!("rust version time elapsed: {}ms", elapsed_tb);
+}
+
+fn factorial_r(s: u64) -> u64 {
+    if s == 1 {
+        return 1;
+    }
+    return s * factorial_r(s - 1_u64);
 }
 
 /// Count number of 1 bits in the buffer
