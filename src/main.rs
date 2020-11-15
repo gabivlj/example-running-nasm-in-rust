@@ -18,10 +18,10 @@ fn main() {
     let tb = time::Instant::now();
     println!("number of 1 bits: {}", count_bits(" ".repeat(REPEAT)));
     let elapsed_tb = tb.elapsed().as_millis();
-    println!("assembly version time elapsed: {}", elapsed_tb);
+    println!("assembly version time elapsed: {}ms", elapsed_tb);
     let tb = time::Instant::now();
     println!(
-        "number of 1 bits rust version: {}ms",
+        "number of 1 bits rust version: {}",
         count_bits_r(" ".repeat(REPEAT))
     );
     let elapsed_tb = tb.elapsed().as_millis();
@@ -32,13 +32,14 @@ fn main() {
 fn count_bits_r<T: Into<Vec<u8>>>(string: T) -> u64 {
     let buffer = string.into();
     let mut count: u64 = 0;
-    for byte in buffer {
-        let mut n = byte;
+    for byte in &buffer {
+        let mut n = *byte;
         while n != 0 {
             count += (n & 1) as u64;
             n >>= 1;
         }
     }
+
     count as u64
 }
 
