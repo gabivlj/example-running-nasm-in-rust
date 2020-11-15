@@ -9,35 +9,26 @@ extern "C" {
 }
 
 fn main() {
-    let x = 0x1_u16;
-    // get memory direction as a u8 pointer
-    let dir: *mut u8 = unsafe { std::mem::transmute(&x) };
-    // get memory dir as a u64 and add 1
-    let mut next_dir: u64 = unsafe { std::mem::transmute(dir) };
-    next_dir += 1;
-    unsafe {
-        // Write in memory : [dir = 1, next_dir = 2] being in little endian : 0x201
-        std::ptr::write_volatile(std::mem::transmute(next_dir), 2 as u8);
-    }
-    // expect 0x201
-    println!("0x{:x}", x);
+    little_endian_example();
+
     // Call asm factorial
     println!("add: {}", factorial(32));
 
-    const REPEAT: usize = 1000000;
+    const REPEAT: usize = 100000000;
     let tb = time::Instant::now();
     println!("number of 1 bits: {}", count_bits(" ".repeat(REPEAT)));
     let elapsed_tb = tb.elapsed().as_millis();
     println!("assembly version time elapsed: {}", elapsed_tb);
     let tb = time::Instant::now();
     println!(
-        "number of 1 bits rust version: {}",
+        "number of 1 bits rust version: {}ms",
         count_bits_r(" ".repeat(REPEAT))
     );
     let elapsed_tb = tb.elapsed().as_millis();
-    println!("rust version time elapsed: {}", elapsed_tb);
+    println!("rust version time elapsed: {}ms", elapsed_tb);
 }
 
+/// Count number of 1 bits in the buffer
 fn count_bits_r<T: Into<Vec<u8>>>(string: T) -> u64 {
     let buffer = string.into();
     let mut count: u64 = 0;
@@ -51,6 +42,7 @@ fn count_bits_r<T: Into<Vec<u8>>>(string: T) -> u64 {
     count as u64
 }
 
+/// Count number of 1 bits in the buffer (asm version)
 fn count_bits<T: Into<Vec<u8>>>(string: T) -> u64 {
     let buff = string.into();
     let size = buff.len();
@@ -59,4 +51,20 @@ fn count_bits<T: Into<Vec<u8>>>(string: T) -> u64 {
 
 fn factorial(a: u64) -> u64 {
     unsafe { factorial_extern(a) }
+}
+
+fn little_endian_example() {
+    // [1]
+    let x = 0x1_u16;
+    // get memory address as a u8 pointer
+    let dir: *mut u8 = unsafe { std::mem::transmute(&x) };
+    // get memory address as a u64 and add 1
+    let mut next_dir: u64 = unsafe { std::mem::transmute(dir) };
+    next_dir += 1;
+    unsafe {
+        // we would put in memory [..., dir = 1, next_dir = 2, ...]
+        // would be in little endian = 0x0201
+        std::ptr::write_volatile(std::mem::transmute(next_dir), 2 as u8);
+    }
+    assert_eq!(x, 0x0201);
 }
