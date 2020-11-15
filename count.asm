@@ -12,7 +12,7 @@ _count_bits_extern:
     start:
       cmp rbp, rsi    
       je end
-      movzx r10, byte [rbp + rdi] ;; REALMENTE QUIERO HACER ESTO EN VEZ DE TENER QUE USAR REGISTROS DE 8 BITS
+      movzx r10, byte [rbp + rdi] ;; 
     compare_bits:
       ;; check if the byte is 0
       cmp r10, 0
