@@ -11,6 +11,7 @@ extern "C" {
 }
 
 fn main() {
+    get_most_repeated_character("ccccaaaaaacasascsasccxv");
     little_endian_example();
     unsafe {
         println!("result {}", switch());
@@ -70,12 +71,10 @@ fn count_bits_r<T: Into<Vec<u8>>>(string: T) -> u64 {
 ///
 pub fn get_most_repeated_character<T: Into<Vec<u8>>>(string: T) -> (u64, char) {
     let buff = string.into();
-    let mut ch: c_char = 0;
-    let ch_ptr = &mut ch;
-    (
-        unsafe { count_max_freq(CString::new(buff).unwrap().as_ptr(), ch_ptr) },
-        ch as u8 as char,
-    )
+    let mut ch: i8 = 1;
+    let res = unsafe { count_max_freq(CString::new(buff).unwrap().as_ptr(), &mut ch) };
+    println!("result: {}", res);
+    (res, ch as u8 as char)
 }
 
 /// Count number of 1 bits in the buffer (asm version)
@@ -116,6 +115,7 @@ mod tests {
         assert_eq!(get_most_repeated_character("aaeee"), (3, 'e'));
         assert_eq!(get_most_repeated_character("aaaeee"), (3, 'e'));
         assert_eq!(get_most_repeated_character("aaeeea"), (3, 'a'));
+        assert_eq!(get_most_repeated_character("bac"), (1, 'c'));
         assert_eq!(get_most_repeated_character(""), (0, 0 as char));
     }
 }

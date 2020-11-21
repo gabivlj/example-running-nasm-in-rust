@@ -13,6 +13,7 @@ section .text
 global _count_max_freq
 
 _count_max_freq:  
+
   ;; rdi => char* (string)
   ;; rsi => char*
 
@@ -20,7 +21,7 @@ _count_max_freq:
   ;; Reset array to 0 (Maybe there is another call to this function)
   @loop:
       mov r14, repetition
-      mov dword[r14+r15], 0
+      mov dword[r14+r15*4], 0
       inc r15
       cmp r15, FREQUENCY_SIZE
       jle @loop
@@ -40,15 +41,15 @@ _count_max_freq:
     cmp r14, 0 ;; check if it is end of string
     je end ;; jump to the end if it is
   
-  add_to_freq:
+  $add_to_freq:
     ;; get memory location of repetitions array
     mov r15, repetition
     ;; store the frequency
-    movsxd r12, dword[r15+r14]
+    movsxd r12, dword [r15+r14*4]
     ;; update the frequency
     inc r12
     ;; store the frequency
-    mov [r15+r14], r12
+    mov [r15+r14*4], dword r12
     ;; compare the new frequency
     cmp rax, r12
     ;; jump to dontupdatemax so we dont update the maximum registers values if
@@ -67,5 +68,5 @@ _count_max_freq:
     jmp start
   
   end:
-    ret
-
+    ; mov rax, repetition
+    ret 

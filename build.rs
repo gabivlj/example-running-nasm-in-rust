@@ -1,5 +1,4 @@
-extern crate cc;
-extern crate nasm_rs;
+use nasm_rs;
 
 fn main() {
     nasm_rs::compile_library(
